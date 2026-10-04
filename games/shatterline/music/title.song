@@ -1,43 +1,45 @@
-# Title theme: A minor, four chords, loops for as long as the title shows.
+# Title theme, loops for as long as the title shows.
+# Darker than the first version: slower, lower, A minor with a flattened
+# second (B flat) and a major dominant (E with G sharp).
 # Channel 0 lead, 1 bass, 2 arpeggio. Patch numbers are indices in patches.c.
-tempo 6
+tempo 7
 patch 0 10
 patch 1 11
 patch 2 12
-volume 0 110
-volume 1 100
-volume 2 55
+volume 0 100
+volume 1 115
+volume 2 45
 loop
 
 # A minor
-0: a4 -  c5 -  e5 -  a5 -  g5 -  e5 -  c5 -  e5 -
-1: a2 -  -  .  a2 -  a2 -  a2 -  -  .  a2 -  e2 -
-2: a3 c4 e4 c4 a3 c4 e4 c4 a3 c4 e4 c4 a3 c4 e4 c4
+0: a4 -  -  -  e4 -  a4 -  c5 -  -  -  b4 -  a4 -
+1: a2 -  a2 -  a2 -  a2 -  a2 -  a2 -  a2 -  e2 -
+2: a3 -  e4 -  c4 -  e4 -  a3 -  e4 -  c4 -  e4 -
 # F major
-0: f5 -  -  -  a5 -  -  -  c6 -  a5 -  f5 -  -  -
-1: f2 -  -  .  f2 -  f2 -  f2 -  -  .  f2 -  c3 -
-2: f3 a3 c4 a3 f3 a3 c4 a3 f3 a3 c4 a3 f3 a3 c4 a3
-# C major
-0: e5 -  g5 -  c6 -  -  -  b5 -  g5 -  e5 -  -  -
-1: c3 -  -  .  c3 -  c3 -  c3 -  -  .  c3 -  g2 -
-2: c4 e4 g4 e4 c4 e4 g4 e4 c4 e4 g4 e4 c4 e4 g4 e4
-# G major
-0: d5 -  g5 -  b5 -  -  -  a5 -  g5 -  d5 -  b4 -
-1: g2 -  -  .  g2 -  g2 -  g2 -  -  .  g2 -  d3 -
-2: g3 b3 d4 b3 g3 b3 d4 b3 g3 b3 d4 b3 g3 b3 d4 b3
+0: a4 -  -  -  f4 -  a4 -  c5 -  -  -  a4 -  f4 -
+1: f2 -  f2 -  f2 -  f2 -  f2 -  f2 -  f2 -  c2 -
+2: f3 -  c4 -  a3 -  c4 -  f3 -  c4 -  a3 -  c4 -
+# D minor
+0: d5 -  -  -  c5 -  a4 -  f4 -  -  -  a4 -  d4 -
+1: d2 -  d2 -  d2 -  d2 -  d2 -  d2 -  d2 -  a2 -
+2: d3 -  a3 -  f3 -  a3 -  d3 -  a3 -  f3 -  a3 -
+# E major
+0: e4 -  g#4 - b4 -  -  -  d5 -  b4 -  g#4 - e4 -
+1: e2 -  e2 -  e2 -  e2 -  e2 -  e2 -  e2 -  b1 -
+2: e3 -  b3 -  g#3 - b3 -  e3 -  b3 -  g#3 - b3 -
 # A minor
-0: a4 -  c5 -  e5 -  a5 -  b5 -  a5 -  e5 -  c5 -
-1: a2 -  -  .  a2 -  a2 -  a2 -  -  .  a2 -  e2 -
-2: a3 c4 e4 c4 a3 c4 e4 c4 a3 c4 e4 c4 a3 c4 e4 c4
-# F major
-0: c6 -  -  -  a5 -  f5 -  a5 -  -  -  c6 -  -  -
-1: f2 -  -  .  f2 -  f2 -  f2 -  -  .  f2 -  c3 -
-2: f3 a3 c4 a3 f3 a3 c4 a3 f3 a3 c4 a3 f3 a3 c4 a3
-# G major
-0: d6 -  -  -  b5 -  g5 -  b5 -  d6 -  b5 -  g5 -
-1: g2 -  -  .  g2 -  g2 -  g2 -  -  .  g2 -  d3 -
-2: g3 b3 d4 b3 g3 b3 d4 b3 g3 b3 d4 b3 g3 b3 d4 b3
+0: a4 -  -  -  c5 -  e5 -  -  -  d5 -  c5 -  a4 -
+1: a2 -  a2 -  a2 -  a2 -  a2 -  a2 -  a2 -  e2 -
+2: a3 -  e4 -  c4 -  e4 -  a3 -  e4 -  c4 -  e4 -
+# B flat major: the dark turn
+0: bb4 - -  -  d5 -  f5 -  -  -  d5 -  bb4 - f4 -
+1: bb1 - bb1 - bb1 - bb1 - bb1 - bb1 - bb1 - f2 -
+2: bb3 - f4 -  d4 -  f4 -  bb3 - f4 -  d4 -  f4 -
+# E major
+0: e5 -  -  -  d5 -  b4 -  g#4 - -  -  b4 -  e4 -
+1: e2 -  e2 -  e2 -  e2 -  e2 -  e2 -  e2 -  b1 -
+2: e3 -  b3 -  g#3 - b3 -  e3 -  b3 -  g#3 - b3 -
 # A minor, landing
-0: a5 -  -  -  -  -  e5 -  c5 -  a4 -  -  -  .  .
-1: a2 -  -  .  a2 -  a2 -  a2 -  e2 -  a2 -  -  .
-2: a3 c4 e4 c4 a3 c4 e4 c4 a3 c4 e4 a4 e4 c4 a3 .
+0: a4 -  -  -  -  -  -  -  e4 -  -  -  a3 -  -  -
+1: a2 -  a2 -  a2 -  a2 -  a1 -  -  -  a1 -  -  -
+2: a3 -  e4 -  c4 -  e4 -  a3 -  -  -  .  -  -  -

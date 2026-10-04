@@ -5,6 +5,6 @@
 
 extern const uint8_t gameoverSong[66];
 extern const uint8_t roundSong[106];
-extern const uint8_t titleSong[1011];
+extern const uint8_t titleSong[715];
 
 #endif
