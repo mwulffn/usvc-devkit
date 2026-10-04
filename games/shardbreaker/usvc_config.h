@@ -1,4 +1,6 @@
-/* Kernel configuration for Shatterline: 8bpp tiles with sprites and sound. */
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
+/* Kernel configuration for Shardbreaker: 8bpp tiles with sprites and sound. */
 #ifndef USVC_CONFIG_H_
 #define USVC_CONFIG_H_
 #include <stdint.h>

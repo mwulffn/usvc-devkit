@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Memory map and peripheral register dispatch.
 //!
 //! Peripheral registers live in a plain backing store so that anything

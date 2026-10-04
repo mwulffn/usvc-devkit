@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! ARMv6-M (Cortex-M0+) Thumb interpreter with per-instruction cycle counts.
 //!
 //! Cycle counts follow the Cortex-M0+ documentation: 1 for data processing,

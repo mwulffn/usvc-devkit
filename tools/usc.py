@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
 """Inspect, unpack and build uSVC game packages (.usc).
 
 A package is a 512-byte header, a 96x72 preview image padded to whole

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Runs the shipped games. Needs the `reference/` submodules; tests are
 //! skipped when they are not checked out.
 

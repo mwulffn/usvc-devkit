@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 #ifndef PATCHES_H
 #define PATCHES_H
 #include "usvc_kernel/audio.h"

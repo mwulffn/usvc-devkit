@@ -1,5 +1,7 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /*
- * Shatterline, a brick-breaking game for the uSVC console.
+ * Shardbreaker, a brick-breaking game for the uSVC console.
  * This file: start-up, the frame loop and input from keyboard and gamepad.
  */
 #include "main.h"
@@ -84,7 +86,7 @@ int main(void)
 	initUsvc(patches);
 	screenInit();
 	gameInit();
-	usvcDebugPrint("shatterline: started\n");
+	usvcDebugPrint("shardbreaker: started\n");
 	while (1)
 	{
 		/* Everything that changes the picture happens in the vertical blank. */

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
 """Convert songs written as text into the uSVC kernel's music format.
 
 Usage:

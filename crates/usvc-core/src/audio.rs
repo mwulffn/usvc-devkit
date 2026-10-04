@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Audio helpers for front ends.
 
 /// Removes the constant offset of the DAC signal, as the AC coupling of the

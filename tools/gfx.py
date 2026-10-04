@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
 """Convert PNG artwork to C source for the uSVC 8bpp tile mode.
 
 Usage:

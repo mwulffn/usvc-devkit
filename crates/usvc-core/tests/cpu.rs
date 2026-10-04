@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Instruction, cycle-count and interrupt behaviour on hand-assembled code.
 
 use usvc_core::{FaultKind, Machine, GAME_BASE};

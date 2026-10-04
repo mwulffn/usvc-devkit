@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 #ifndef SCREEN_H_
 #define SCREEN_H_
 #include <stdint.h>

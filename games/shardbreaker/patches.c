@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /*
  * Sound effects. Each patch is a list of (frames to wait, command, value);
  * PC_PITCH takes a MIDI note number.

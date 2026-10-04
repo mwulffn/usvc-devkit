@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! The `.usc` game package: a 512-byte header, a preview image and the raw
 //! binary that the game loader writes to flash at `0x6000`.
 

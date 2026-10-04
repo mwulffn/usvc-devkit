@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
 """Round-trip tests for usc.py against the shipped packages."""
 
 from pathlib import Path

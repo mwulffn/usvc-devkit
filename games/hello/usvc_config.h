@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /* Kernel configuration for the hello template: bitmapped mode, no audio. */
 #ifndef USVC_CONFIG_H_
 #define USVC_CONFIG_H_

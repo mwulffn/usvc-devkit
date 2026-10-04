@@ -14,7 +14,7 @@ can be written and tested without hardware. Plan and hardware notes:
 - `tools/` – Python utilities, managed with `uv`.
 - `sdk/` – Makefile, CMSIS headers and `usvc_debug.h` for building games.
 - `games/` – our games. `games/hello` is the minimal template;
-  `games/shatterline` is a full game (8bpp tiles, sprites, sound, keyboard
+  `games/shardbreaker` is a full game (8bpp tiles, sprites, sound, keyboard
   and gamepad) and the model for asset handling.
 - `reference/` – upstream next-hack repos as submodules. Read-only.
   `reference/uSVC/usc packages/*.usc` are the test programs.
@@ -70,9 +70,9 @@ opens on the user's screen and runs until closed (or until `--frames`).
 - In 8bpp tile mode every tile shown must be in RAM (`tiles[]`), 64 bytes
   each, and each tile a sprite overlaps costs another; watch the 32 KB.
 - Change tiles only between `restoreBackgroundTiles()` and `drawSprites()`,
-  inside the vertical blank. Shatterline's `EMULATOR=1` build prints the
+  inside the vertical blank. Shardbreaker's `EMULATOR=1` build prints the
   scan line where a frame's work ended; it must stay below 524.
-- `--tap FRAME:KEY:FRAMES` holds a key. Shatterline plays itself if the
+- `--tap FRAME:KEY:FRAMES` holds a key. Shardbreaker plays itself if the
   title screen is left alone for 900 frames, which is the easy way to
   exercise it headless. Its `EMULATOR=1` build also accepts keys 1-6
   during play to hand out a capsule (E S M L Z C).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Symbol names from an objdump listing (`.lss`), for readable addresses.
 
 #[derive(Default)]

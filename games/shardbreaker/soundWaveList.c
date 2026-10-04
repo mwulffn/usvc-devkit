@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /* The sound waves the audio engine can play: only the kernel's built-in ones. */
 #include "main.h"
 

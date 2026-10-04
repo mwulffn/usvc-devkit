@@ -1,5 +1,7 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /*
- * Shatterline game logic: paddle, balls, bricks, capsules, laser, wisps,
+ * Shardbreaker game logic: paddle, balls, bricks, capsules, laser, wisps,
  * game states and the self-playing demo.
  */
 #include "main.h"
@@ -184,8 +186,8 @@ static void drawPanel(void)
 
 static void drawPanelLabels(void)
 {
-	drawText(PANEL_COLUMN, 1, "SHATTER");
-	drawText(PANEL_COLUMN + 4, 2, "LINE");
+	drawText(PANEL_COLUMN, 1, "SHARD");
+	drawText(PANEL_COLUMN + 3, 2, "BREAKER");
 	drawText(PANEL_COLUMN + 2, 5, "SCORE");
 	drawText(PANEL_COLUMN + 2, 9, "HIGH");
 	drawText(PANEL_COLUMN + 2, 13, "LEVEL");

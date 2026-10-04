@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Rebuilds the picture from writes to the upper half of the PORT `OUT`
 //! register, the way a monitor would: by time since the sync pulses.
 

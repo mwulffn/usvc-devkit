@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /*
  * Hello uSVC: the smallest useful game skeleton.
  * Prints text in bitmapped mode, counts seconds and shows the last key.

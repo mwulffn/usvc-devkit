@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Input scripts: timed key and gamepad events for a headless run.
 //!
 //! One event per line, `#` starts a comment:

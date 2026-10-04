@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /* Tile drawing: the playfield frame, bricks, background and text. */
 #include "main.h"
 
@@ -113,12 +115,11 @@ static const char *logoLetter(char c)
 		case 'S': return "a##" "#.." "c#b" "..#" "##d";
 		case 'H': return "#.#" "#.#" "###" "#.#" "#.#";
 		case 'A': return "a#b" "#.#" "###" "#.#" "#.#";
-		case 'T': return "###" ".#." ".#." ".#." ".#.";
-		case 'E': return "###" "#.." "##." "#.." "###";
 		case 'R': return "##b" "#.#" "##d" "#b." "#.#";
-		case 'L': return "#.." "#.." "#.." "#.." "###";
-		case 'N': return "#.#" "#b#" "#c#" "#.#" "#.#";
-		default:  return "###" ".#." ".#." ".#." "###";	/* I */
+		case 'D': return "##b" "#.#" "#.#" "#.#" "##d";
+		case 'B': return "##b" "#.#" "##." "#.#" "##d";
+		case 'K': return "#.#" "#.d" "##." "#.b" "#.#";
+		default:  return "###" "#.." "##." "#.." "###";	/* E */
 	}
 }
 
@@ -143,7 +144,7 @@ void drawTitleScreen(void)
 {
 	for (int row = 0; row < SCREEN_ROWS; row++)
 		clearRow(row, 0, SCREEN_COLUMNS - 1);
-	drawLogoWord("SHATTER", 6, 3, TILE_LOGO_A_FULL);
-	drawLogoWord("LINE", 19, 10, TILE_LOGO_B_FULL);
+	drawLogoWord("SHARD", 8, 3, TILE_LOGO_A_FULL);
+	drawLogoWord("BREAKER", 7, 10, TILE_LOGO_B_FULL);
 	drawText(5, 22, "A D OR STICK: MOVE   SPACE: FIRE");
 }

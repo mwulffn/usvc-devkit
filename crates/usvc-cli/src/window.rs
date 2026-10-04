@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! SDL window: picture, sound, host keyboard and gamepads.
 //!
 //! The host keyboard becomes the console's USB keyboard. The first host

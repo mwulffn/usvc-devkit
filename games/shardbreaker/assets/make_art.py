@@ -1,11 +1,13 @@
-"""Draw the Shatterline artwork.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
+"""Draw the Shardbreaker artwork.
 
 Writes tiles.png + tiles.txt and sprites.png + frames.txt next to this file.
 Those four files are the source assets: tools/gfx.py turns them into C. Run
 this script only to regenerate the art from scratch; hand edits to the PNG
 files are lost when it runs.
 
-    cd tools && uv run python ../games/shatterline/assets/make_art.py
+    cd tools && uv run python ../games/shardbreaker/assets/make_art.py
 
 Colours are given as console levels: red 0-7, green 0-7, blue 0-3.
 """

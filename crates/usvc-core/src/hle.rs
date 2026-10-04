@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Host implementation of the bootloader library.
 //!
 //! Games built with `USE_BOOTLOADER` reach USB and FAT functions through a

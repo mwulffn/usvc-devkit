@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Portable emulator core for the uSVC console (ATSAMD21E18, Cortex-M0+).
 //!
 //! The core has no I/O and no platform dependencies. A front end loads a game

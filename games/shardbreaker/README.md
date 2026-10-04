@@ -1,4 +1,4 @@
-# Shatterline
+# Shardbreaker
 
 A brick-breaking game for the uSVC console. Original artwork, levels and
 sounds.
@@ -34,12 +34,12 @@ about fifteen seconds and the game plays a silent demo; press fire to stop it.
 From the repository root:
 
 ```sh
-make -C sdk GAME=../games/shatterline play      # build and play in a window
-make -C sdk GAME=../games/shatterline run       # build, run headless, screenshot
-make -C sdk GAME=../games/shatterline assets    # after editing artwork or songs
+make -C sdk GAME=../games/shardbreaker play      # build and play in a window
+make -C sdk GAME=../games/shardbreaker run       # build, run headless, screenshot
+make -C sdk GAME=../games/shardbreaker assets    # after editing artwork or songs
 ```
 
-The package for the SD card is `build/shatterline/shatterline.usc`.
+The package for the SD card is `build/shardbreaker/shardbreaker.usc`.
 
 ## Files
 

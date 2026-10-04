@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! TCC0-2, the event system and SysTick.
 //!
 //! Free-running timers are not ticked. Each keeps the cycle at which its

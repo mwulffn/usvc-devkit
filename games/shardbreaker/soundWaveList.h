@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 #ifndef SOUNDWAVELIST_H_
 #define SOUNDWAVELIST_H_
 #include "usvc_kernel/audio.h"

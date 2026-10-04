@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! Key names for front ends and input scripts, as USB HID usage codes.
 
 /// A key on a USB keyboard.

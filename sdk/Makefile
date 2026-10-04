@@ -1,10 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Michael Wulff Nielsen
 # Build a uSVC game with arm-none-eabi-gcc.
 #
 #   make -C sdk GAME=../games/hello            build build/hello/hello.usc
 #   make -C sdk GAME=../games/hello run        build, run headless, write a PNG
 #   make -C sdk GAME=../games/hello play       build and play in a window
 #   make -C sdk GAME=../games/hello EMULATOR=1 enable usvcDebugPrint
-#   make -C sdk GAME=../games/shatterline assets   PNG artwork -> gen/*.c
+#   make -C sdk GAME=../games/shardbreaker assets   PNG artwork -> gen/*.c
 #
 # The kernel, start-up code and linker script come from the upstream template
 # unless the game directory has its own usvc_kernel/ or Device_Startup/.

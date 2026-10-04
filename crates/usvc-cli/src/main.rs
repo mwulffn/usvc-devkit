@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Michael Wulff Nielsen
 //! uSVC emulator front end: a window with sound and live input, or a
 //! headless run that writes screenshots and a report.
 

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright (C) 2026 Michael Wulff Nielsen */
 /*
  * Level layouts. Each level is BRICK_ROWS strings of BRICK_COLUMNS characters:
  * '.' empty, '1'-'8' coloured bricks (red, orange, yellow, green, cyan, blue,
