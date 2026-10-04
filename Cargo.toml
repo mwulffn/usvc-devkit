@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = ["crates/usvc-core", "crates/usvc-cli"]
+
+[profile.release]
+opt-level = 3
+debug = true
+
+[profile.dev]
+opt-level = 2

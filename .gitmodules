@@ -1,0 +1,15 @@
+[submodule "reference/uSVC"]
+	path = reference/uSVC
+	url = https://github.com/next-hack/uSVC
+[submodule "reference/uSVC_Redballs"]
+	path = reference/uSVC_Redballs
+	url = https://github.com/next-hack/uSVC_Redballs
+[submodule "reference/uSVC_Fairplay-race"]
+	path = reference/uSVC_Fairplay-race
+	url = https://github.com/next-hack/uSVC_Fairplay-race
+[submodule "reference/uSVC_Tetris"]
+	path = reference/uSVC_Tetris
+	url = https://github.com/next-hack/uSVC_Tetris
+[submodule "reference/uChipGameMapEditor"]
+	path = reference/uChipGameMapEditor
+	url = https://github.com/next-hack/uChipGameMapEditor
