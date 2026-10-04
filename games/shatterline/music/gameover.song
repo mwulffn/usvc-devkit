@@ -1,0 +1,9 @@
+# Played once at "GAME OVER".
+tempo 9
+patch 0 10
+patch 1 11
+volume 0 110
+volume 1 100
+
+0: a5 -  -  e5 -  -  c5 -  -  b4 -  -  a4 -  -  -  -  -  .  .
+1: a2 -  -  -  -  -  e2 -  -  -  -  -  a1 -  -  -  -  -  .  .

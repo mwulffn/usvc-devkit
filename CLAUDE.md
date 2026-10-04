@@ -13,7 +13,9 @@ can be written and tested without hardware. Plan and hardware notes:
   without SDL.
 - `tools/` – Python utilities, managed with `uv`.
 - `sdk/` – Makefile, CMSIS headers and `usvc_debug.h` for building games.
-- `games/` – our games. `games/hello` is the template to copy.
+- `games/` – our games. `games/hello` is the minimal template;
+  `games/shatterline` is a full game (8bpp tiles, sprites, sound, keyboard
+  and gamepad) and the model for asset handling.
 - `reference/` – upstream next-hack repos as submodules. Read-only.
   `reference/uSVC/usc packages/*.usc` are the test programs.
 
@@ -28,7 +30,8 @@ cargo clippy --release --all-targets
 ./target/release/usvc "reference/uSVC/usc packages/Tetris.usc" --headless \
     --frames 300 --png out/shot.png --tap 100:S --tap 160:SPACE -v
 
-# build a game and run it in the emulator (output in build/<name>/)
+# build a game and run it in the emulator. Output goes to build/<name>-emu/
+# with EMULATOR=1 and build/<name>/ without (the package for real hardware).
 make -C sdk GAME=../games/hello EMULATOR=1 run FRAMES=120 RUNFLAGS="--tap 60:K"
 
 cd tools && uv run pytest -q && uv run ruff check . && uv run ruff format .
@@ -57,6 +60,22 @@ opens on the user's screen and runs until closed (or until `--frames`).
 - A game is a directory with `main.c`, `main.h` and `usvc_config.h`; the
   Makefile adds the kernel from `reference/` (or the game's own
   `usvc_kernel/` if it has one). Never edit files under `reference/`.
+- Artwork: PNG files in a game's `assets/` are converted to C in `gen/` by
+  `tools/gfx.py` (`make -C sdk GAME=... assets`). `gen/` is committed.
+  Sprite pixel value 0 is transparent, so the tool stores opaque black as
+  the darkest red.
+- Music: songs are text files in a game's `music/` directory, converted by
+  `tools/song.py` (also run by the `assets` target). Channel 3 is left to
+  sound effects. Nobody can hear the result headless; ask the user.
+- In 8bpp tile mode every tile shown must be in RAM (`tiles[]`), 64 bytes
+  each, and each tile a sprite overlaps costs another; watch the 32 KB.
+- Change tiles only between `restoreBackgroundTiles()` and `drawSprites()`,
+  inside the vertical blank. Shatterline's `EMULATOR=1` build prints the
+  scan line where a frame's work ended; it must stay below 524.
+- `--tap FRAME:KEY:FRAMES` holds a key. Shatterline plays itself if the
+  title screen is left alone for 900 frames, which is the easy way to
+  exercise it headless. Its `EMULATOR=1` build also accepts keys 1-6
+  during play to hand out a capsule (E S M L Z C).
 - `usvcDebugPrint()` (from `usvc_debug.h`) writes text to the emulator's
   stdout. It only does anything when built with `EMULATOR=1`; the port
   address faults on real hardware, so hardware builds must omit that flag.

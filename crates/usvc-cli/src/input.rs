@@ -54,12 +54,16 @@ impl Script {
         Ok(script)
     }
 
-    /// Add `FRAME:KEY` (a tap) as given on the command line.
+    /// Add a tap given on the command line as `FRAME:KEY` or
+    /// `FRAME:KEY:FRAMES` (how long to hold it).
     pub fn add_tap(&mut self, spec: &str) -> Result<(), String> {
-        let (frame, key) = spec
-            .split_once(':')
-            .ok_or_else(|| format!("expected FRAME:KEY, got \"{spec}\""))?;
-        self.parse_line(&format!("{frame} tap {key}"))?;
+        let parts: Vec<&str> = spec.split(':').collect();
+        let line = match parts[..] {
+            [frame, key] => format!("{frame} tap {key}"),
+            [frame, key, hold] => format!("{frame} tap {key} {hold}"),
+            _ => return Err(format!("expected FRAME:KEY[:FRAMES], got \"{spec}\"")),
+        };
+        self.parse_line(&line)?;
         self.events.sort_by_key(|(f, _)| *f);
         Ok(())
     }

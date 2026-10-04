@@ -1,0 +1,11 @@
+# Played once while "READY" shows at the start of a level.
+tempo 6
+patch 0 10
+patch 1 11
+volume 0 110
+volume 1 100
+
+0: c5 -  e5 -  g5 -  c6 -  -  -  g5 -  c6 -  e6 -
+1: c3 -  -  -  g2 -  -  -  c3 -  -  -  e3 -  g3 -
+0: g6 -  -  -  -  -  -  -  .  .  .  .
+1: c3 -  -  -  -  -  -  -  .  .  .  .

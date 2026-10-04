@@ -43,8 +43,8 @@ struct Args {
     /// Input script (see `input.rs` for the format)
     #[arg(long)]
     input: Option<PathBuf>,
-    /// Tap a key at a frame, as FRAME:KEY (repeatable)
-    #[arg(long, value_name = "FRAME:KEY")]
+    /// Press a key at a frame, as FRAME:KEY or FRAME:KEY:FRAMES_HELD (repeatable)
+    #[arg(long, value_name = "FRAME:KEY[:FRAMES]")]
     tap: Vec<String>,
     /// Plug in a gamepad even if the host has none
     #[arg(long)]

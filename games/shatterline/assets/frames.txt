@@ -1,0 +1,15 @@
+# name x y width height handle_x handle_y (in sprites.png)
+paddle 0 0 32 8 0 0
+paddle_wide 0 8 48 8 0 0
+paddle_laser 0 16 32 8 0 0
+paddle_catch 0 24 32 8 0 0
+ball 0 32 6 6 0 0
+shot 8 32 2 6 0 0
+wisp_0 16 32 12 12 0 0
+wisp_1 28 32 12 12 0 0
+capsule_e 0 48 16 8 0 0
+capsule_s 16 48 16 8 0 0
+capsule_m 32 48 16 8 0 0
+capsule_l 48 48 16 8 0 0
+capsule_z 64 48 16 8 0 0
+capsule_c 80 48 16 8 0 0
