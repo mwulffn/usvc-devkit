@@ -8,7 +8,9 @@ can be written and tested without hardware. Plan and hardware notes:
 
 - `crates/usvc-core` – portable emulator core. No I/O, no platform
   dependencies, no crates. Keep it that way.
-- `crates/usvc-cli` – headless runner (`usvc` binary).
+- `crates/usvc-cli` – the `usvc` binary: an SDL window by default,
+  `--headless` for automated runs. `--no-default-features` builds it
+  without SDL.
 - `tools/` – Python utilities, managed with `uv`.
 - `sdk/` – Makefile, CMSIS headers and `usvc_debug.h` for building games.
 - `games/` – our games. `games/hello` is the template to copy.
@@ -23,7 +25,7 @@ cargo test --release            # CPU unit tests + all shipped games
 cargo clippy --release --all-targets
 
 # run a game for N frames and look at the result
-./target/release/usvc "reference/uSVC/usc packages/Tetris.usc" \
+./target/release/usvc "reference/uSVC/usc packages/Tetris.usc" --headless \
     --frames 300 --png out/shot.png --tap 100:S --tap 160:SPACE -v
 
 # build a game and run it in the emulator (output in build/<name>/)
@@ -33,7 +35,11 @@ cd tools && uv run pytest -q && uv run ruff check . && uv run ruff format .
 uv run usc.py info GAME.usc
 ```
 
-`usvc --help` lists the options: `--png`, `--png-every N`, `--wav`,
+Always pass `--headless` when running it yourself; without it a window
+opens on the user's screen and runs until closed (or until `--frames`).
+`make ... run` is headless, `make ... play` opens the window.
+
+`usvc --help` lists the options: `--no-keyboard`, `--scale`, `--mute`, `--png`, `--png-every N`, `--wav`,
 `--input SCRIPT`, `--tap FRAME:KEY`, `--gamepad`, `--report FILE.json`,
 `--lss LISTING` (symbol names for faults).
 
@@ -44,6 +50,10 @@ uv run usc.py info GAME.usc
   reached its `WFI` late and the picture is shifted: a timing bug.
 - A healthy frame has `lines_drawn` = 400 per frame.
 - Tetris is played with W/A/S/D and space, not the arrow keys.
+- In the window the host keyboard is the console's USB keyboard and the
+  first host gamepad or joystick is its USB gamepad. F12 saves a screenshot.
+- Tetris and other games use the gamepad only when no keyboard is
+  installed; pass `--no-keyboard` to test gamepad input.
 - A game is a directory with `main.c`, `main.h` and `usvc_config.h`; the
   Makefile adds the kernel from `reference/` (or the game's own
   `usvc_kernel/` if it has one). Never edit files under `reference/`.

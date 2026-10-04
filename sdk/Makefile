@@ -1,7 +1,8 @@
 # Build a uSVC game with arm-none-eabi-gcc.
 #
 #   make -C sdk GAME=../games/hello            build build/hello/hello.usc
-#   make -C sdk GAME=../games/hello run        build and run in the emulator
+#   make -C sdk GAME=../games/hello run        build, run headless, write a PNG
+#   make -C sdk GAME=../games/hello play       build and play in a window
 #   make -C sdk GAME=../games/hello EMULATOR=1 enable usvcDebugPrint
 #
 # The kernel, start-up code and linker script come from the upstream template
@@ -51,7 +52,7 @@ LSS := $(BUILD)/$(NAME).lss
 USC := $(BUILD)/$(NAME).usc
 STAMP := $(BUILD)/.kernel
 
-.PHONY: all run clean
+.PHONY: all run play clean
 all: $(USC) $(LSS)
 	@$(SIZE) $(ELF)
 
@@ -85,8 +86,12 @@ $(USC): $(BIN)
 
 run: all
 	cargo build --release --manifest-path $(ROOT)/Cargo.toml
-	$(ROOT)/target/release/usvc $(USC) --frames $(FRAMES) --lss $(LSS) \
+	$(ROOT)/target/release/usvc $(USC) --headless --frames $(FRAMES) --lss $(LSS) \
 		--png $(BUILD)/$(NAME).png $(RUNFLAGS)
+
+play: all
+	cargo build --release --manifest-path $(ROOT)/Cargo.toml
+	$(ROOT)/target/release/usvc $(USC) --lss $(LSS) $(RUNFLAGS)
 
 clean:
 	rm -rf $(BUILD)

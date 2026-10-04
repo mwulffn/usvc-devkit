@@ -1,4 +1,5 @@
-//! Headless runner: load a game, run frames, write screenshots and a report.
+//! uSVC emulator front end: a window with sound and live input, or a
+//! headless run that writes screenshots and a report.
 
 use std::fs;
 use std::io::BufWriter;
@@ -6,26 +7,34 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::Parser;
+use usvc_core::audio::DcBlocker;
 use usvc_core::{Fault, FrameResult, Machine, AUDIO_HZ, GAME_BASE, SCREEN_HEIGHT, SCREEN_WIDTH};
 
 mod input;
 mod symbols;
+#[cfg(feature = "window")]
+mod window;
+
+const DEFAULT_HEADLESS_FRAMES: u32 = 60;
 
 #[derive(Parser)]
 #[command(name = "usvc", about = "Run a uSVC game without hardware")]
 struct Args {
     /// Game to run: a .usc package or a raw .bin linked at 0x6000
     game: PathBuf,
-    /// Number of frames to run
-    #[arg(short, long, default_value_t = 60)]
-    frames: u32,
+    /// Run without a window, as fast as possible, then print a summary
+    #[arg(long)]
+    headless: bool,
+    /// Stop after this many frames (headless default: 60; window: unlimited)
+    #[arg(short, long)]
+    frames: Option<u32>,
     /// Write the last frame to this PNG file
     #[arg(long)]
     png: Option<PathBuf>,
     /// Write a PNG every N frames into --png-dir
     #[arg(long, value_name = "N")]
     png_every: Option<u32>,
-    /// Directory for --png-every
+    /// Directory for --png-every and for screenshots taken in the window
     #[arg(long, default_value = "out")]
     png_dir: PathBuf,
     /// Write the audio to this WAV file
@@ -37,9 +46,18 @@ struct Args {
     /// Tap a key at a frame, as FRAME:KEY (repeatable)
     #[arg(long, value_name = "FRAME:KEY")]
     tap: Vec<String>,
-    /// Plug in a gamepad as well as the keyboard
+    /// Plug in a gamepad even if the host has none
     #[arg(long)]
     gamepad: bool,
+    /// Unplug the keyboard, for games that prefer it over the gamepad
+    #[arg(long)]
+    no_keyboard: bool,
+    /// Window size as a multiple of 640x400
+    #[arg(long, default_value_t = 2)]
+    scale: u32,
+    /// No sound in the window
+    #[arg(long)]
+    mute: bool,
     /// Write a machine-readable run report (JSON) to this file
     #[arg(long)]
     report: Option<PathBuf>,
@@ -51,7 +69,9 @@ struct Args {
     verbose: bool,
 }
 
-fn write_png(path: &Path, fb: &[u32]) -> Result<(), Box<dyn std::error::Error>> {
+type AnyError = Box<dyn std::error::Error>;
+
+fn write_png(path: &Path, fb: &[u32]) -> Result<(), AnyError> {
     if let Some(dir) = path.parent().filter(|d| !d.as_os_str().is_empty()) {
         fs::create_dir_all(dir)?;
     }
@@ -110,93 +130,112 @@ fn print_fault(f: &Fault, syms: &symbols::Symbols) {
     );
 }
 
-fn main() -> ExitCode {
-    let args = Args::parse();
-    let data = match fs::read(&args.game) {
-        Ok(d) => d,
-        Err(e) => {
-            eprintln!("cannot read {}: {e}", args.game.display());
-            return ExitCode::from(2);
-        }
-    };
-    let syms = match &args.lss {
-        Some(p) => match fs::read(p) {
-            Ok(text) => symbols::Symbols::from_lss(&text),
-            Err(e) => {
-                eprintln!("cannot read {}: {e}", p.display());
-                return ExitCode::from(2);
-            }
-        },
-        None => symbols::Symbols::default(),
-    };
+/// A running game plus everything collected from it, shared by both modes.
+struct Session {
+    m: Machine,
+    script: input::Script,
+    frame: u32,
+    frames_done: u32,
+    timeouts: u32,
+    fault: Option<Fault>,
+    /// Audio of the whole run, kept only when a WAV file was asked for.
+    audio: Vec<i16>,
+    keep_audio: bool,
+    audio_samples: usize,
+    dc: DcBlocker,
+    png_every: Option<u32>,
+    png_dir: PathBuf,
+}
 
-    let mut m = Machine::new();
-    if data.starts_with(b"USVC") {
-        match m.load_usc(&data) {
-            Ok(pkg) => println!("loaded \"{}\" ({} bytes)", pkg.short_title, pkg.binary.len()),
-            Err(e) => {
-                eprintln!("{}: {e}", args.game.display());
-                return ExitCode::from(2);
-            }
-        }
-    } else {
-        m.load_bin(&data, GAME_BASE);
-    }
-
-    let mut script = match &args.input {
-        Some(p) => match fs::read_to_string(p)
-            .map_err(|e| e.to_string())
-            .and_then(|t| input::Script::parse(&t))
-        {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("{}: {e}", p.display());
-                return ExitCode::from(2);
-            }
-        },
-        None => input::Script::default(),
-    };
-    for spec in &args.tap {
-        if let Err(e) = script.add_tap(spec) {
-            eprintln!("--tap: {e}");
-            return ExitCode::from(2);
-        }
-    }
-    m.set_devices(true, args.gamepad || script.uses_gamepad);
-
-    let mut audio: Vec<i16> = Vec::new();
-    let mut frames_done = 0;
-    let mut timeouts = 0;
-    let mut fault = None;
-    for frame in 0..args.frames {
-        script.apply(frame, &mut m);
-        match m.run_frame() {
-            FrameResult::Frame => frames_done += 1,
-            FrameResult::Timeout => timeouts += 1,
+impl Session {
+    /// Run one frame. Returns its audio, or `None` once the machine faulted.
+    fn run_frame(&mut self) -> Result<Option<Vec<i16>>, AnyError> {
+        self.script.apply(self.frame, &mut self.m);
+        match self.m.run_frame() {
+            FrameResult::Frame => self.frames_done += 1,
+            FrameResult::Timeout => self.timeouts += 1,
             FrameResult::Fault(f) => {
-                fault = Some(f);
-                break;
+                self.fault = Some(f);
+                return Ok(None);
             }
         }
-        audio.extend(m.take_audio());
-        let text = m.take_debug_output();
+        self.frame += 1;
+        let mut samples = self.m.take_audio();
+        self.dc.process(&mut samples);
+        self.audio_samples += samples.len();
+        if self.keep_audio {
+            self.audio.extend_from_slice(&samples);
+        }
+        let text = self.m.take_debug_output();
         if !text.is_empty() {
             print!("{}", String::from_utf8_lossy(&text));
         }
-        if let Some(n) = args.png_every.filter(|n| *n > 0) {
-            if (frame + 1) % n == 0 {
-                let path = args.png_dir.join(format!("frame{:05}.png", frame + 1));
-                if let Err(e) = write_png(&path, m.framebuffer()) {
-                    eprintln!("cannot write {}: {e}", path.display());
-                    return ExitCode::from(2);
-                }
+        if let Some(n) = self.png_every.filter(|n| *n > 0) {
+            if self.frame % n == 0 {
+                let path = self.png_dir.join(format!("frame{:05}.png", self.frame));
+                write_png(&path, self.m.framebuffer())?;
             }
         }
+        Ok(Some(samples))
     }
 
-    let stats = m.take_stats();
+    fn run_headless(&mut self, frames: u32) -> Result<(), AnyError> {
+        for _ in 0..frames {
+            if self.run_frame()?.is_none() {
+                break;
+            }
+        }
+        Ok(())
+    }
+}
+
+fn report_json(s: &Session, stats: &usvc_core::Stats, syms: &symbols::Symbols) -> String {
+    let fault = match &s.fault {
+        Some(f) => format!(
+            "{{\"kind\": \"{:?}\", \"pc\": {}, \"symbol\": \"{}\", \"addr\": {}, \
+             \"lr\": {}, \"sp\": {}, \"cycle\": {}}}",
+            f.kind,
+            f.pc,
+            syms.describe(f.pc),
+            f.addr,
+            f.lr,
+            f.sp,
+            f.cycle
+        ),
+        None => "null".to_string(),
+    };
+    let min_slack = if stats.wfi_count == 0 {
+        "null".to_string()
+    } else {
+        stats.wfi_min_slack.to_string()
+    };
+    format!(
+        "{{\n  \"frames\": {},\n  \"timeouts\": {},\n  \"cycles\": {},\n  \
+         \"instructions\": {},\n  \"frame_hash\": \"{:016x}\",\n  \"interrupts\": {},\n  \
+         \"handler_cycles\": {},\n  \"lines_drawn\": {},\n  \"min_wfi_slack\": {min_slack},\n  \
+         \"min_sp\": {},\n  \"audio_samples\": {},\n  \"pc\": {},\n  \"pc_symbol\": \"{}\",\n  \
+         \"fault\": {fault}\n}}\n",
+        s.frames_done,
+        s.timeouts,
+        s.m.cycles,
+        stats.instructions,
+        frame_hash(s.m.framebuffer()),
+        stats.exceptions,
+        stats.handler_cycles,
+        stats.wfi_count,
+        stats.min_sp,
+        s.audio_samples,
+        s.m.cpu.r[15],
+        syms.describe(s.m.cpu.r[15]),
+    )
+}
+
+fn print_summary(s: &Session, stats: &usvc_core::Stats, syms: &symbols::Symbols, verbose: bool) {
+    let m = &s.m;
     println!(
-        "frames={frames_done} timeouts={timeouts} cycles={} instructions={} hash={:016x}",
+        "frames={} timeouts={} cycles={} instructions={} hash={:016x}",
+        s.frames_done,
+        s.timeouts,
         m.cycles,
         stats.instructions,
         frame_hash(m.framebuffer())
@@ -214,7 +253,7 @@ fn main() -> ExitCode {
         stats.min_sp
     );
     println!("pc={:#010x} ({})", m.cpu.r[15], syms.describe(m.cpu.r[15]));
-    if args.verbose {
+    if verbose {
         println!("video: {:?}", m.video_debug());
         let calls: Vec<String> = m
             .hle_call_counts()
@@ -224,68 +263,108 @@ fn main() -> ExitCode {
             .map(|(i, c)| format!("{i}:{c}"))
             .collect();
         println!("library calls (index:count): {}", calls.join(" "));
-        let regs: Vec<String> = m.unmodelled_registers().map(|r| format!("{r:#010x}")).collect();
+        let regs: Vec<String> = m
+            .unmodelled_registers()
+            .map(|r| format!("{r:#010x}"))
+            .collect();
         println!("stubbed registers touched: {}", regs.join(" "));
     }
-    if let Some(path) = &args.png {
-        if let Err(e) = write_png(path, m.framebuffer()) {
-            eprintln!("cannot write {}: {e}", path.display());
-            return ExitCode::from(2);
+}
+
+fn run(args: &Args) -> Result<ExitCode, AnyError> {
+    let data = fs::read(&args.game).map_err(|e| format!("{}: {e}", args.game.display()))?;
+    let syms = match &args.lss {
+        Some(p) => {
+            let text = fs::read(p).map_err(|e| format!("{}: {e}", p.display()))?;
+            symbols::Symbols::from_lss(&text)
         }
+        None => symbols::Symbols::default(),
+    };
+
+    let mut m = Machine::new();
+    let mut title = args
+        .game
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    if data.starts_with(b"USVC") {
+        let pkg = m
+            .load_usc(&data)
+            .map_err(|e| format!("{}: {e}", args.game.display()))?;
+        println!("loaded \"{}\" ({} bytes)", pkg.short_title, pkg.binary.len());
+        if !pkg.short_title.is_empty() {
+            title = pkg.short_title;
+        }
+    } else {
+        m.load_bin(&data, GAME_BASE);
+    }
+
+    let mut script = match &args.input {
+        Some(p) => {
+            let text = fs::read_to_string(p).map_err(|e| format!("{}: {e}", p.display()))?;
+            input::Script::parse(&text).map_err(|e| format!("{}: {e}", p.display()))?
+        }
+        None => input::Script::default(),
+    };
+    for spec in &args.tap {
+        script.add_tap(spec).map_err(|e| format!("--tap: {e}"))?;
+    }
+    m.set_devices(!args.no_keyboard, args.gamepad || script.uses_gamepad);
+
+    let mut session = Session {
+        m,
+        script,
+        frame: 0,
+        frames_done: 0,
+        timeouts: 0,
+        fault: None,
+        audio: Vec::new(),
+        keep_audio: args.wav.is_some(),
+        audio_samples: 0,
+        dc: DcBlocker::default(),
+        png_every: args.png_every,
+        png_dir: args.png_dir.clone(),
+    };
+
+    #[cfg(feature = "window")]
+    if args.headless {
+        session.run_headless(args.frames.unwrap_or(DEFAULT_HEADLESS_FRAMES))?;
+    } else {
+        window::run(&mut session, args, &title)?;
+    }
+    #[cfg(not(feature = "window"))]
+    {
+        let _ = &title;
+        session.run_headless(args.frames.unwrap_or(DEFAULT_HEADLESS_FRAMES))?;
+    }
+
+    let stats = session.m.take_stats();
+    print_summary(&session, &stats, &syms, args.verbose);
+    if let Some(path) = &args.png {
+        write_png(path, session.m.framebuffer())?;
     }
     if let Some(path) = &args.wav {
-        if let Err(e) = write_wav(path, &audio) {
-            eprintln!("cannot write {}: {e}", path.display());
-            return ExitCode::from(2);
-        }
+        write_wav(path, &session.audio)?;
     }
     if let Some(path) = &args.report {
-        let fault_json = match &fault {
-            Some(f) => format!(
-                "{{\"kind\": \"{:?}\", \"pc\": {}, \"symbol\": \"{}\", \"addr\": {}, \
-                 \"lr\": {}, \"sp\": {}, \"cycle\": {}}}",
-                f.kind,
-                f.pc,
-                syms.describe(f.pc),
-                f.addr,
-                f.lr,
-                f.sp,
-                f.cycle
-            ),
-            None => "null".to_string(),
-        };
-        let min_slack = if stats.wfi_count == 0 {
-            "null".to_string()
-        } else {
-            stats.wfi_min_slack.to_string()
-        };
-        let report = format!(
-            "{{\n  \"frames\": {frames_done},\n  \"timeouts\": {timeouts},\n  \
-             \"cycles\": {},\n  \"instructions\": {},\n  \"frame_hash\": \"{:016x}\",\n  \
-             \"interrupts\": {},\n  \"handler_cycles\": {},\n  \"lines_drawn\": {},\n  \
-             \"min_wfi_slack\": {min_slack},\n  \"min_sp\": {},\n  \"audio_samples\": {},\n  \
-             \"pc\": {},\n  \"pc_symbol\": \"{}\",\n  \"fault\": {fault_json}\n}}\n",
-            m.cycles,
-            stats.instructions,
-            frame_hash(m.framebuffer()),
-            stats.exceptions,
-            stats.handler_cycles,
-            stats.wfi_count,
-            stats.min_sp,
-            audio.len(),
-            m.cpu.r[15],
-            syms.describe(m.cpu.r[15]),
-        );
-        if let Err(e) = fs::write(path, report) {
-            eprintln!("cannot write {}: {e}", path.display());
-            return ExitCode::from(2);
-        }
+        fs::write(path, report_json(&session, &stats, &syms))?;
     }
-    match fault {
+    Ok(match &session.fault {
         Some(f) => {
-            print_fault(&f, &syms);
+            print_fault(f, &syms);
             ExitCode::from(1)
         }
         None => ExitCode::SUCCESS,
+    })
+}
+
+fn main() -> ExitCode {
+    let args = Args::parse();
+    match run(&args) {
+        Ok(code) => code,
+        Err(e) => {
+            eprintln!("error: {e}");
+            ExitCode::from(2)
+        }
     }
 }

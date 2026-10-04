@@ -1,7 +1,8 @@
 # uSVC emulator and SDK plan
 
 Status: confirmed. M0-M5 are implemented except the items listed under
-"Progress". M6 (window) has not been started.
+"Progress". M6 (window) is implemented; the user confirmed that keyboard,
+gamepad, Tetris and Redballs work in it.
 
 ## Progress
 

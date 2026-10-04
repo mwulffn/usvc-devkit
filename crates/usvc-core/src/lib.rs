@@ -3,6 +3,7 @@
 //! The core has no I/O and no platform dependencies. A front end loads a game
 //! image, calls [`Machine::run_frame`], and reads the framebuffer and audio.
 
+pub mod audio;
 mod bus;
 mod cpu;
 mod hle;
