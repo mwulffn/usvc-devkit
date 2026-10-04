@@ -12,6 +12,7 @@ sounds.
 |---|---|---|
 | Move the paddle | A / D or left / right arrow | stick or direction pad (the stick is analogue) |
 | Launch the ball, confirm | space or enter | buttons 1-4 or start |
+| Pause | P | select |
 
 Break every brick to clear a level. Steel bricks take two hits; gold bricks
 cannot be broken. Some bricks drop a capsule; catch it with the paddle:
@@ -28,6 +29,9 @@ E, Z and C replace each other, and all three end when you lose the ball.
 Wisps drift down from the top now and then. They pass over bricks and do no
 harm, but they knock the ball back when it hits them. The ball, a laser bolt
 or the paddle destroys them for points.
+
+There are thirteen levels. Clearing the last one earns a bonus, and the levels
+then start over with a faster ball.
 
 The ball speeds up as you keep it in play. Leave the title screen alone for
 about fifteen seconds and the game plays a silent demo; press fire to stop it.
@@ -66,5 +70,5 @@ The package for the SD card is `build/shardbreaker/shardbreaker.usc`.
 ## Testing aid
 
 Built with `EMULATOR=1`, these keys work during play: 1-6 hand out a capsule
-(E S M L Z C), 9 skips to the next level, and 0 switches an autopilot on or
+(E S M L Z C), 9 clears the level, and 0 switches an autopilot on or
 off. The normal build has none of this.

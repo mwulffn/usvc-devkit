@@ -33,6 +33,9 @@ static void readKeyboard(input_t *input)
 			case ' ': case '\r':
 				input->fire = 1;
 				break;
+			case 'p': case 'P':
+				input->pause = 1;
+				break;
 #ifdef USVC_EMULATOR
 			/* Testing aids: keys 1-6 hand out a capsule (E S M L Z C), 9 skips
 			   to the next level, 0 switches the autopilot on or off. */
@@ -66,6 +69,8 @@ static void readGamepad(input_t *input)
 	}
 	if (pad.buttons & GAMEPAD_FIRE_BUTTONS)
 		input->fire = 1;
+	if (pad.buttons & GP_BUTTON_SELECT)
+		input->pause = 1;
 }
 
 /* Service USB for the rest of the frame and return the latest input. */
@@ -75,6 +80,7 @@ static void pollInput(input_t *input)
 	{
 		input->move = 0;
 		input->fire = 0;
+		input->pause = 0;
 		input->cheat = 0;
 		usbHostTask();
 		if (usbHidBootKeyboardIsInstalled())
@@ -86,7 +92,7 @@ static void pollInput(input_t *input)
 
 int main(void)
 {
-	input_t input = {0, 0, 0};
+	input_t input = {0, 0, 0, 0};
 	initUsvc(patches);
 	screenInit();
 	gameInit();

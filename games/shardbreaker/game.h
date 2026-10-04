@@ -13,6 +13,7 @@ typedef struct
 {
 	int8_t move;		/* paddle speed, -INPUT_MOVE_MAX (left) to INPUT_MOVE_MAX */
 	uint8_t fire;		/* launch the ball, confirm */
+	uint8_t pause;		/* pause or continue the game */
 	uint8_t cheat;		/* emulator builds only: 1-6 capsule, or a CHEAT_ value; else 0 */
 } input_t;
 

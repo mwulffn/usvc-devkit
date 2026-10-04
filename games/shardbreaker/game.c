@@ -45,6 +45,8 @@
 #define SPEED_START (2 * ONE)
 #define SPEED_MAX (7 * ONE / 2)
 #define SPEED_STEP (ONE / 8)
+/* Each level starts this much faster than the one before. */
+#define LEVEL_SPEED_STEP (ONE / 16)
 #define HITS_PER_SPEED_STEP 6
 /* The ball moves in this many steps per frame so it cannot skip a brick. */
 #define MOVE_STEPS 2
@@ -54,6 +56,10 @@
 #define MESSAGE_ROW 19
 #define LOST_PAUSE_FRAMES 60
 #define CLEAR_PAUSE_FRAMES 100
+/* Clearing the last level of a round earns a bonus and a longer celebration. */
+#define ALL_CLEAR_PAUSE_FRAMES 280
+#define LEVEL_BONUS 1000
+#define ALL_CLEAR_BONUS 10000
 /* The title screen starts a self-playing demo after this long. */
 #define DEMO_START_FRAMES 900
 #define DEMO_SERVE_FRAMES 40
@@ -114,6 +120,8 @@ static struct
 	int16_t speed;
 	uint8_t paddleHits;
 	uint8_t lastFire;
+	uint8_t lastPause;
+	uint8_t paused;
 	uint8_t lastCheat;
 	uint8_t autopilot;			/* testing aid: the paddle plays by itself */
 	uint8_t shotCooldown;
@@ -218,7 +226,7 @@ static void serve(void)
 	clearObjects();
 	g.balls[0].active = 1;
 	g.paddleMode = PADDLE_NORMAL;
-	g.speed = SPEED_START + g.level * SPEED_STEP;
+	g.speed = SPEED_START + g.level * LEVEL_SPEED_STEP;
 	if (g.speed > SPEED_MAX)
 		g.speed = SPEED_MAX;
 	g.paddleHits = 0;
@@ -685,12 +693,22 @@ static void play(int fire, int fireHeld)
 	updateWisps();
 	if (g.remaining == 0)
 	{
+		/* After the last layout the levels start over, faster. */
+		int roundDone = (g.level + 1) % NUM_LEVELS == 0;
 		g.state = STATE_CLEAR;
-		g.timer = CLEAR_PAUSE_FRAMES;
+		g.timer = roundDone ? ALL_CLEAR_PAUSE_FRAMES : CLEAR_PAUSE_FRAMES;
 		clearObjects();
-		addScore(1000);
-		fx(FX_CLEAR);
-		drawMessage("LEVEL CLEAR");
+		addScore(roundDone ? ALL_CLEAR_BONUS : LEVEL_BONUS);
+		if (roundDone)
+		{
+			drawMessage("ALL CLEAR  BONUS 10000");
+			playMusic(victorySong);
+		}
+		else
+		{
+			drawMessage("LEVEL CLEAR");
+			fx(FX_CLEAR);
+		}
 	}
 	else if (!alive)
 	{
@@ -748,6 +766,7 @@ static void demoInput(input_t *input)
 			target = &g.balls[i];
 	input->move = 0;
 	input->fire = 0;
+	input->pause = 0;
 	input->cheat = 0;
 	if (g.state == STATE_SERVE)
 	{
@@ -792,6 +811,23 @@ void gameUpdate(const input_t *playerInput)
 	int fire = playerInput->fire && !g.lastFire;	/* only on the press */
 	g.lastFire = playerInput->fire;
 	g.frame++;
+	/* Pause freezes a game in progress; the picture stays as it is. */
+	int pausePressed = playerInput->pause && !g.lastPause;
+	g.lastPause = playerInput->pause;
+	if (pausePressed && !g.demo && (g.state == STATE_SERVE || g.state == STATE_PLAY))
+	{
+		g.paused = !g.paused;
+		clearMessage();
+		if (g.paused)
+			drawMessage("PAUSED");
+		else if (g.state == STATE_SERVE)
+			drawMessage("READY");
+	}
+	if (g.paused)
+	{
+		queueSprites();
+		return;
+	}
 	/* Testing aids, only ever set by emulator builds. */
 	int cheat = playerInput->cheat != g.lastCheat ? playerInput->cheat : 0;
 	g.lastCheat = playerInput->cheat;
@@ -843,11 +879,10 @@ void gameUpdate(const input_t *playerInput)
 		case STATE_PLAY:
 			movePaddle(input->move);
 			if (cheat == CHEAT_NEXT_LEVEL)
-				startLevel(g.level + 1);
-			else if (cheat >= 1 && cheat <= CAPSULE_TYPES)
+				g.remaining = 0;	/* the level counts as cleared */
+			if (cheat >= 1 && cheat <= CAPSULE_TYPES)
 				applyCapsule(cheat - 1);
-			else
-				play(fire, input->fire);
+			play(fire, input->fire);
 			break;
 		case STATE_LOST:
 			if (--g.timer == 0)

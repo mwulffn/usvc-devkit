@@ -146,5 +146,6 @@ void drawTitleScreen(void)
 		clearRow(row, 0, SCREEN_COLUMNS - 1);
 	drawLogoWord("SHARD", 8, 3, TILE_LOGO_A_FULL);
 	drawLogoWord("BREAKER", 7, 10, TILE_LOGO_B_FULL);
-	drawText(5, 22, "A D OR STICK: MOVE   SPACE: FIRE");
+	drawText(4, 22, "A D OR STICK: MOVE   SPACE: FIRE");
+	drawText(4, 23, "P OR SELECT: PAUSE");
 }

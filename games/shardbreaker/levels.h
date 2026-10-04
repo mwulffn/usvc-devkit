@@ -14,7 +14,7 @@
 #define BRICK_STEEL_CRACKED 10
 #define BRICK_GOLD 11			/* cannot be broken */
 
-#define NUM_LEVELS 6
+#define NUM_LEVELS 13
 
 /* Fill `bricks` with level `n` (0-based); returns how many can be broken. */
 int loadLevel(int n, uint8_t bricks[BRICK_ROWS][BRICK_COLUMNS]);
