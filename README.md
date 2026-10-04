@@ -13,6 +13,14 @@ and a game made with them.
 - **Shardbreaker** (`games/shardbreaker`): a brick-breaking game.
   See its [README](games/shardbreaker/README.md).
 
+| | |
+|---|---|
+| ![Shardbreaker title screen](docs/images/shardbreaker-title.png) | ![Laser paddle on level 1](docs/images/shardbreaker-laser.png) |
+| ![Catch paddle and a falling capsule on level 2](docs/images/shardbreaker-chevrons.png) | ![Level 4 with a wisp and a capsule](docs/images/shardbreaker-diamond.png) |
+
+Shardbreaker running in the emulator: 320x200 pixels, 256 colours, tiles and
+sprites drawn by the console's own kernel.
+
 Nothing here has been tested on a real console yet.
 
 ## Getting started

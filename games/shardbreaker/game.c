@@ -115,6 +115,7 @@ static struct
 	uint8_t paddleHits;
 	uint8_t lastFire;
 	uint8_t lastCheat;
+	uint8_t autopilot;			/* testing aid: the paddle plays by itself */
 	uint8_t shotCooldown;
 	uint16_t wispTimer;
 	uint8_t demo;				/* the game is playing itself */
@@ -791,6 +792,19 @@ void gameUpdate(const input_t *playerInput)
 	int fire = playerInput->fire && !g.lastFire;	/* only on the press */
 	g.lastFire = playerInput->fire;
 	g.frame++;
+	/* Testing aids, only ever set by emulator builds. */
+	int cheat = playerInput->cheat != g.lastCheat ? playerInput->cheat : 0;
+	g.lastCheat = playerInput->cheat;
+	if (cheat == CHEAT_AUTOPILOT)
+		g.autopilot = !g.autopilot;
+	if (g.autopilot && !g.demo && (g.state == STATE_SERVE || g.state == STATE_PLAY))
+	{
+		static uint8_t lastAutoFire;
+		demoInput(&demo);
+		input = &demo;
+		fire = demo.fire && !lastAutoFire;
+		lastAutoFire = demo.fire;
+	}
 	if (g.demo)
 	{
 		if (fire)
@@ -828,10 +842,12 @@ void gameUpdate(const input_t *playerInput)
 			break;
 		case STATE_PLAY:
 			movePaddle(input->move);
-			if (playerInput->cheat && playerInput->cheat != g.lastCheat)
-				applyCapsule(playerInput->cheat - 1);
-			g.lastCheat = playerInput->cheat;
-			play(fire, input->fire);
+			if (cheat == CHEAT_NEXT_LEVEL)
+				startLevel(g.level + 1);
+			else if (cheat >= 1 && cheat <= CAPSULE_TYPES)
+				applyCapsule(cheat - 1);
+			else
+				play(fire, input->fire);
 			break;
 		case STATE_LOST:
 			if (--g.timer == 0)

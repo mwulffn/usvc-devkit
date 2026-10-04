@@ -5,13 +5,15 @@
 #include <stdint.h>
 
 #define INPUT_MOVE_MAX 127
+#define CHEAT_NEXT_LEVEL 9
+#define CHEAT_AUTOPILOT 10
 
 /* What the player is asking for this frame, whatever the device. */
 typedef struct
 {
 	int8_t move;		/* paddle speed, -INPUT_MOVE_MAX (left) to INPUT_MOVE_MAX */
 	uint8_t fire;		/* launch the ball, confirm */
-	uint8_t cheat;		/* emulator builds only: capsule 1-6 to hand out, or 0 */
+	uint8_t cheat;		/* emulator builds only: 1-6 capsule, or a CHEAT_ value; else 0 */
 } input_t;
 
 void gameInit(void);

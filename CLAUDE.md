@@ -75,7 +75,8 @@ opens on the user's screen and runs until closed (or until `--frames`).
 - `--tap FRAME:KEY:FRAMES` holds a key. Shardbreaker plays itself if the
   title screen is left alone for 900 frames, which is the easy way to
   exercise it headless. Its `EMULATOR=1` build also accepts keys 1-6
-  during play to hand out a capsule (E S M L Z C).
+  during play to hand out a capsule (E S M L Z C), 9 to skip a level and 0
+  to toggle an autopilot.
 - `usvcDebugPrint()` (from `usvc_debug.h`) writes text to the emulator's
   stdout. It only does anything when built with `EMULATOR=1`; the port
   address faults on real hardware, so hardware builds must omit that flag.
@@ -84,6 +85,8 @@ opens on the user's screen and runs until closed (or until `--frames`).
 - Check after kernel-affecting changes: upstream Tetris rebuilt with
   `make -C sdk GAME=../reference/uSVC_Tetris NAME=tetris FRAMES=200 run`
   must print the same `hash=` as the shipped `Tetris.usc` at 200 frames.
+- Screenshots for the READMEs are in `docs/images/`. `--png` writes 320x400;
+  double the width (nearest neighbour) to get the shape the console shows.
 - The golden frame hashes in `crates/usvc-core/tests/games.rs` were approved
   by eye from screenshots, not checked against real hardware. Only change
   one after the user has approved the new picture.

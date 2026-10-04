@@ -34,9 +34,13 @@ static void readKeyboard(input_t *input)
 				input->fire = 1;
 				break;
 #ifdef USVC_EMULATOR
-			/* Testing aid: keys 1-6 hand out a capsule (E S M L Z C). */
-			case '1': case '2': case '3': case '4': case '5': case '6':
+			/* Testing aids: keys 1-6 hand out a capsule (E S M L Z C), 9 skips
+			   to the next level, 0 switches the autopilot on or off. */
+			case '1': case '2': case '3': case '4': case '5': case '6': case '9':
 				input->cheat = keys[i] - '0';
+				break;
+			case '0':
+				input->cheat = CHEAT_AUTOPILOT;
 				break;
 #endif
 		}

@@ -3,6 +3,9 @@
 A brick-breaking game for the uSVC console. Original artwork, levels and
 sounds.
 
+![Title screen](../../docs/images/shardbreaker-title.png)
+![Level 4 with a wisp and a capsule](../../docs/images/shardbreaker-diamond.png)
+
 ## Playing
 
 | | Keyboard | Gamepad |
@@ -59,5 +62,6 @@ The package for the SD card is `build/shardbreaker/shardbreaker.usc`.
 
 ## Testing aid
 
-Built with `EMULATOR=1`, the keys 1-6 hand out a capsule (E S M L Z C) during
-play. The normal build does not have this.
+Built with `EMULATOR=1`, these keys work during play: 1-6 hand out a capsule
+(E S M L Z C), 9 skips to the next level, and 0 switches an autopilot on or
+off. The normal build has none of this.
