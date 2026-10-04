@@ -54,9 +54,12 @@ The package for the SD card is `build/shardbreaker/shardbreaker.usc`.
 - `patches.c` – sound effects and the instruments the songs use
 - `music/` – songs as text (see `tools/song.py` for the format); the
   `assets` target converts them too
+- `game.mk` – the title, description, author, date and version shown in the
+  game loader's menu
 - `assets/` – `tiles.png` and `sprites.png` with their name lists; edit them
   in any paint program, then run the `assets` target. `make_art.py` drew the
-  first version and overwrites hand edits if run again.
+  first version and overwrites hand edits if run again. `preview.png` is the
+  picture for the game loader's menu.
 - `gen/` – C generated from the artwork and songs by `tools/gfx.py` and
   `tools/song.py`
 

@@ -1,8 +1,20 @@
-# uSVC emulator, SDK and games
+# usvc-devkit
 
-Tools for writing games for the [uSVC](https://github.com/next-hack/uSVC)
-console (uChip Simple VGA Console, ATSAMD21 Cortex-M0+) without the hardware,
-and a game made with them.
+An emulator, SDK and tools for writing games for the
+[uSVC](https://github.com/next-hack/uSVC) console without the hardware, and
+a game made with them.
+
+uSVC (uChip Simple VGA Console) is an open-source retro console designed by
+Nicola Wrachien of [next-hack](https://next-hack.com) together with Itaca
+Innovation: an ATSAMD21 Cortex-M0+ that generates VGA and sound in software.
+Everything here builds on their work. Games are compiled against the
+[uSVC kernel](https://github.com/next-hack/uSVC), and the emulator was
+written by reading it. If you like this, go and look at the original
+project, its [games](https://github.com/next-hack?tab=repositories) and the
+articles on next-hack.com.
+
+This is an independent project and is not affiliated with next-hack or Itaca
+Innovation.
 
 - **Emulator** (`crates/`): runs unmodified uSVC game packages (`.usc`) in a
   window with sound, keyboard and gamepad, or headless for automated tests.
@@ -67,5 +79,9 @@ their artwork, levels and music.
 - The keyboard translation in `crates/usvc-core/src/hle.rs` is ported from
   the uSVC kernel.
 
-uSVC and uChip are names of their respective owners; this project is not
-affiliated with them.
+uSVC and uChip are names of their respective owners.
+
+## Thanks
+
+To Nicola Wrachien and next-hack for designing the console, writing the
+kernel and publishing all of it under a free licence.

@@ -22,6 +22,9 @@ GAME_DIR := $(abspath $(GAME))
 -include $(GAME_DIR)/game.mk
 NAME     ?= $(notdir $(GAME_DIR))
 TITLE    ?= $(NAME)
+# Picture and extra text for the game loader's menu (see tools/usc.py pack).
+PREVIEW  ?= $(GAME_DIR)/gen/preview.raw
+USC_FLAGS ?=
 # Emulator builds get their own directory, so that objects with the debug
 # port compiled in can never end up in a package meant for hardware.
 BUILD    ?= $(ROOT)/build/$(NAME)$(if $(EMULATOR),-emu)
@@ -94,8 +97,9 @@ $(BIN): $(ELF)
 $(LSS): $(ELF)
 	$(OBJDUMP) -h -S $< > $@
 
-$(USC): $(BIN)
-	cd $(ROOT)/tools && uv run usc.py pack $(BIN) $(USC) --title "$(TITLE)"
+$(USC): $(BIN) $(wildcard $(PREVIEW)) $(wildcard $(GAME_DIR)/game.mk)
+	cd $(ROOT)/tools && uv run usc.py pack $(BIN) $(USC) --title "$(TITLE)" \
+		$(USC_FLAGS) $(if $(wildcard $(PREVIEW)),--preview $(PREVIEW))
 
 run: all
 	cargo build --release --manifest-path $(ROOT)/Cargo.toml
@@ -113,6 +117,8 @@ assets:
 		$(GAME_DIR)/assets/tiles.txt $(GAME_DIR)/gen/tiles
 	cd $(ROOT)/tools && uv run gfx.py sprites $(GAME_DIR)/assets/sprites.png \
 		$(GAME_DIR)/assets/frames.txt $(GAME_DIR)/gen/sprites
+	@if [ -f $(GAME_DIR)/assets/preview.png ]; then \
+		cd $(ROOT)/tools && uv run gfx.py preview $(GAME_DIR)/assets/preview.png $(PREVIEW); fi
 	@if ls $(GAME_DIR)/music/*.song >/dev/null 2>&1; then \
 		cd $(ROOT)/tools && uv run song.py $(GAME_DIR)/gen/songs $(GAME_DIR)/music/*.song; fi
 

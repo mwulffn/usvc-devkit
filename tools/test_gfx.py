@@ -40,3 +40,9 @@ def test_sprite_transparency_and_black(tmp_path: Path) -> None:
     source = (tmp_path / "out.c").read_text()
     assert "0x00, 0x01" in source
     assert ".w = 2, .h = 1, .ox = 1, .oy = 0" in source
+
+
+def test_preview_is_scaled_to_loader_size(tmp_path: Path) -> None:
+    Image.new("RGBA", (640, 400), (255, 0, 0, 255)).save(tmp_path / "shot.png")
+    gfx.convert_preview(tmp_path / "shot.png", tmp_path / "p.raw")
+    assert (tmp_path / "p.raw").read_bytes() == bytes([0x07]) * (96 * 72)

@@ -64,6 +64,9 @@ opens on the user's screen and runs until closed (or until `--frames`).
   `tools/gfx.py` (`make -C sdk GAME=... assets`). `gen/` is committed.
   Sprite pixel value 0 is transparent, so the tool stores opaque black as
   the darkest red.
+- Package text for the game loader's menu is set in a game's `game.mk`
+  (lines of at most 15 characters); its picture comes from
+  `assets/preview.png` via the `assets` target.
 - Music: songs are text files in a game's `music/` directory, converted by
   `tools/song.py` (also run by the `assets` target). Channel 3 is left to
   sound effects. Nobody can hear the result headless; ask the user.

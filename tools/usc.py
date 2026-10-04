@@ -137,6 +137,21 @@ def cmd_unpack(args: argparse.Namespace) -> None:
     print(f"wrote binary.bin and preview.raw to {args.out_dir}")
 
 
+# The game loader prints these fields in a column 15 characters wide.
+LOADER_LINE_WIDTH = 15
+
+
+def warn_long_lines(pkg: Package) -> None:
+    lines = [*pkg.title, *pkg.description, *pkg.authors]
+    for text in lines:
+        if len(text) > LOADER_LINE_WIDTH:
+            print(
+                f'warning: "{text}" is longer than {LOADER_LINE_WIDTH} characters '
+                "and will be cut off in the game loader",
+                file=sys.stderr,
+            )
+
+
 def cmd_pack(args: argparse.Namespace) -> None:
     preview = args.preview.read_bytes() if args.preview else bytes(PREVIEW_BYTES)
     pkg = Package(
@@ -149,6 +164,7 @@ def cmd_pack(args: argparse.Namespace) -> None:
         version=args.version,
         preview=preview,
     )
+    warn_long_lines(pkg)
     args.out.write_bytes(build(pkg))
     print(f"wrote {args.out} ({len(pkg.binary)} byte binary)")
 

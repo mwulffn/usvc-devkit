@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 description = "Portable uSVC console emulator core (no I/O, no platform dependencies)"
 license = "GPL-3.0-or-later"
+repository = "https://github.com/mwulffn/usvc-devkit"
 
 [dependencies]

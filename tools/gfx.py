@@ -5,6 +5,7 @@
 Usage:
     uv run gfx.py tiles SHEET.png NAMES.txt OUT
     uv run gfx.py sprites SHEET.png FRAMES.txt OUT
+    uv run gfx.py preview IMAGE.png OUT.raw
 
 `tiles` slices SHEET.png into 8x8 tiles, left to right then top to bottom.
 NAMES.txt has one tile name per line, in that order; the number of names is
@@ -18,6 +19,9 @@ centre). It writes OUT.c and OUT.h with `spriteData`, `frameData` and one
 0, which the kernel does not draw.
 
 In both files `#` starts a comment.
+
+`preview` scales any image to the 96x72 picture the game loader shows for a
+package and writes it as raw pixel bytes, for `usc.py pack --preview`.
 """
 
 import argparse
@@ -168,6 +172,16 @@ def convert_sprites(sheet: Path, frames_file: Path, out: Path) -> None:
     print(f"{len(frames)} frames, {len(data)} bytes -> {out.with_suffix('.c')}")
 
 
+PREVIEW_SIZE = (96, 72)
+
+
+def convert_preview(image_path: Path, out: Path) -> None:
+    image = Image.open(image_path).convert("RGBA")
+    image = image.resize(PREVIEW_SIZE, Image.Resampling.LANCZOS)
+    out.write_bytes(region_bytes(image, 0, 0, *PREVIEW_SIZE, sprite=False))
+    print(f"preview {PREVIEW_SIZE[0]}x{PREVIEW_SIZE[1]} -> {out}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -177,9 +191,15 @@ def main() -> int:
         cmd.add_argument("listing", type=Path, help="names or frames text file")
         cmd.add_argument("out", type=Path, help="output path without extension")
         cmd.set_defaults(func=func)
+    preview = sub.add_parser("preview")
+    preview.add_argument("image", type=Path, help="any image; it is scaled")
+    preview.add_argument("out", type=Path, help="output file (raw bytes)")
     args = parser.parse_args()
     try:
-        args.func(args.sheet, args.listing, args.out)
+        if args.command == "preview":
+            convert_preview(args.image, args.out)
+        else:
+            args.func(args.sheet, args.listing, args.out)
     except (OSError, ValueError) as err:
         print(f"error: {err}", file=sys.stderr)
         return 1
