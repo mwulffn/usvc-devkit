@@ -48,6 +48,9 @@ make -C sdk GAME=../games/shardbreaker assets    # after editing artwork or song
 
 The package for the SD card is `build/shardbreaker/shardbreaker.usc`.
 
+See [Making a game](../../docs/making-a-game.md) for how the pieces fit
+together.
+
 ## Files
 
 - `main.c` – start-up, frame loop, keyboard and gamepad input

@@ -51,7 +51,15 @@ cargo build --release
 make -C sdk GAME=../games/shardbreaker play
 ```
 
-`CLAUDE.md` lists the commands for development and testing.
+## Documentation
+
+- [Making a game](docs/making-a-game.md): from an empty directory to a
+  package, with the rules that are easy to break
+- [The emulator](docs/emulator.md): options, the run summary, what is and
+  is not emulated
+- [How the console works](docs/hardware.md): timing, video modes, memory
+  layout, the package format
+- `CLAUDE.md`: commands and conventions for working in this repository
 
 ## Licence
 
