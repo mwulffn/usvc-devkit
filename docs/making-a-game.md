@@ -130,6 +130,7 @@ make -C sdk GAME=../games/yourgame assets
 
 This runs `tools/gfx.py` on the files in the game's `assets/` directory and
 writes C files into `gen/`, which the build picks up. Commit `gen/`.
+It converts whichever of the files below the game has and skips the rest.
 
 - `assets/tiles.png` with `assets/tiles.txt`: the image is cut into 8x8
   tiles in reading order; the text file gives each tile a name, one per

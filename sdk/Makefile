@@ -95,9 +95,11 @@ $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
 $(LSS): $(ELF)
-	$(OBJDUMP) -h -S $< > $@
+	$(OBJDUMP) -h -t -S $< > $@
 
-$(USC): $(BIN) $(wildcard $(PREVIEW)) $(wildcard $(GAME_DIR)/game.mk)
+# Always repacked: the title and other text can change on the command line.
+.PHONY: FORCE
+$(USC): $(BIN) FORCE
 	cd $(ROOT)/tools && uv run usc.py pack $(BIN) $(USC) --title "$(TITLE)" \
 		$(USC_FLAGS) $(if $(wildcard $(PREVIEW)),--preview $(PREVIEW))
 
@@ -113,10 +115,13 @@ play: all
 # Regenerate gen/*.c from the PNG artwork in the game's assets/ directory and
 # the songs in its music/ directory.
 assets:
-	cd $(ROOT)/tools && uv run gfx.py tiles $(GAME_DIR)/assets/tiles.png \
-		$(GAME_DIR)/assets/tiles.txt $(GAME_DIR)/gen/tiles
-	cd $(ROOT)/tools && uv run gfx.py sprites $(GAME_DIR)/assets/sprites.png \
-		$(GAME_DIR)/assets/frames.txt $(GAME_DIR)/gen/sprites
+	@mkdir -p $(GAME_DIR)/gen
+	@if [ -f $(GAME_DIR)/assets/tiles.png ]; then \
+		cd $(ROOT)/tools && uv run gfx.py tiles $(GAME_DIR)/assets/tiles.png \
+			$(GAME_DIR)/assets/tiles.txt $(GAME_DIR)/gen/tiles; fi
+	@if [ -f $(GAME_DIR)/assets/sprites.png ]; then \
+		cd $(ROOT)/tools && uv run gfx.py sprites $(GAME_DIR)/assets/sprites.png \
+			$(GAME_DIR)/assets/frames.txt $(GAME_DIR)/gen/sprites; fi
 	@if [ -f $(GAME_DIR)/assets/preview.png ]; then \
 		cd $(ROOT)/tools && uv run gfx.py preview $(GAME_DIR)/assets/preview.png $(PREVIEW); fi
 	@if ls $(GAME_DIR)/music/*.song >/dev/null 2>&1; then \
