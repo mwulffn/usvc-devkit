@@ -19,6 +19,12 @@ working in the repository. The substance is in `docs/`:
   without SDL.
 - `tools/` – Python utilities, managed with `uv`.
 - `sdk/` – Makefile, CMSIS headers and `usvc_debug.h` for building games.
+- `loader/` – builds the console's game loader from the upstream source.
+  With `HUB=1` it builds a loader with USB hub support and no logo or sound
+  (`loader/hub`: one new file and patches to a copy of the upstream source).
+  `loader/hubtest` is a test program that runs in the loader's place on a
+  real console and shows what it finds behind a USB hub. All of these only
+  build; nothing in the repository writes to a console.
 - `games/` – our games. `games/hello` is the minimal template;
   `games/shardbreaker` is a full game (8bpp tiles, sprites, sound, keyboard
   and gamepad) and the model for asset handling.
@@ -39,6 +45,11 @@ cargo clippy --release --all-targets
 # build a game and run it in the emulator. Output goes to build/<name>-emu/
 # with EMULATOR=1 and build/<name>/ without (the package for real hardware).
 make -C sdk GAME=../games/hello EMULATOR=1 run FRAMES=120 RUNFLAGS="--tap 60:K"
+
+# build the game loader and report how much of its 16384-byte slot is free.
+# HUB=1 builds the one with USB hub support, in build/loader-hub/
+make -C loader
+make -C loader HUB=1
 
 cd tools && uv run pytest -q && uv run ruff check . && uv run ruff format .
 uv run usc.py info GAME.usc

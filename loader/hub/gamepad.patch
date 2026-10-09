@@ -1,0 +1,12 @@
+--- a/usvc_kernel/USB_HID_Generic_Gamepad.c
++++ b/usvc_kernel/USB_HID_Generic_Gamepad.c
+@@ -360,7 +360,8 @@
+ 					break;
+ 				case GP_CONFIGURATION_SET:
+ 					USB_GAMEPAD_TRACE("GP SET CONFIG SET");
+-					pdev->installationStep = GP_SET_INTERFACE_PROTOCOL;
++					// The boot protocol is not asked for: a gamepad has none, and may refuse the request.
++					pdev->installationStep = GP_REQUEST_GET_REPORT_DESCRIPTOR;
+ 					break;
+ 				case GP_SET_INTERFACE_PROTOCOL:
+ 					USB_GAMEPAD_TRACE("GP SET IF PROTOCOL");

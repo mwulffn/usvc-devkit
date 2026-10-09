@@ -1,0 +1,54 @@
+--- a/usvc_kernel/usb_host.c
++++ b/usvc_kernel/usb_host.c
+@@ -334,6 +334,10 @@
+ }		
+ 
+ 
++// A hub on the console's port is set up by usbHubSetup(), which then starts
++// the enumeration again for a device behind the hub. See loader/hub.
++#define HUB_SETUP 0x40
++void usbHubSetup(usbModuleData_t *pUSB, usbDevice_t *pdev);
+ uint32_t usbEnumeration(uint8_t device)
+ {
+ 	usbModuleData_t *pUSB = getUSBData(); 	
+@@ -371,7 +375,7 @@
+ 			{
+ 				// now reset the device. Again.	
+ 				
+-				if (device  == 0)			
++				if (device  == 0 && !pUSBdev->hubPort)	// behind a hub, the hub has reset the port
+ 				{
+ 					uhdBusReset();  //issue bus reset
+ 					USB_TRACE(" +SEND RESET");
+@@ -421,7 +425,7 @@
+ 			{
+ 				// now send a set address command. However now use the correct ep0 size.
+ 				uhdPipe0Alloc(0, pUSBdev->ep0Size);				
+-				pUSBdev->address = pUSB->currentUSBdeviceNumber + 1;
++				pUSBdev->address = pUSB->currentUSBdeviceNumber + 1 + (pUSBdev->hubPort != 0);	// a hub keeps address 1
+ 				usbCreateSetAddress(pUSB->pUsbEndpoint0ControlBuffer,pUSBdev->address);
+ 				pUSBdev->enumerationState = WAIT_FOR_SET_ADDRESS_SENT;
+ 				usbAddTransaction(0, 0, pUSB->pUsbEndpoint0ControlBuffer, pUSB->pUsbEndpoint0Buffer, DIRECTION_OUT, USB_TRANSFER_TYPE_CONTROL, USB_TIMEOUT, enumerationErrorCallback, enumTransactionCompleteCallback, &pUSBdev->enumerationState);				
+@@ -450,6 +454,12 @@
+ 		case PARSE_DEVICE_DESCRIPTOR:
+ 			{
+ 				usbDeviceDescriptor_t *dd = (usbDeviceDescriptor_t *) pUSB->pUsbEndpoint0Buffer;
++				if (dd->bDeviceClass == USB_CLASS_HUB && !pUSBdev->hubPort)
++				{
++					pUSBdev->installationStep = 0;
++					pUSBdev->enumerationState = HUB_SETUP;
++					break;
++				}
+ 				pUSBdev->bDeviceClass = dd->bDeviceClass;
+ 				pUSBdev->bDeviceSubClass = dd->bDeviceSubClass ;
+ 				pUSBdev->idVendor = dd->idVendor;
+@@ -557,6 +567,9 @@
+ 			pUSB->pUsbDeviceInstallers[pUSB->enumeratingDeviceType](DEVICE_INSTALLED_CALLBACK, pUSBdev, pUSB->pTmpUsbInterfaces);
+ 			r = USB_STATE_RUNNING;
+ 			break;
++		case HUB_SETUP:
++			usbHubSetup(pUSB, pUSBdev);
++			break;
+ 		case DEVICE_NOT_SUPPORTED:
+ 			USB_TRACE("NO driver for the attached device!");
+ 			if (pUSB->pUnsupportedDeviceCallback)

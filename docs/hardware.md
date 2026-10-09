@@ -3,7 +3,8 @@
 Notes taken while writing the emulator. They come from reading the kernel
 source in `reference/uSVC/software/uSVC_Template_Project/usvc_kernel` (line
 numbers below refer to that copy) and the schematic, and from measurements in
-the emulator. Nothing here has been checked against a real console.
+the emulator. Nothing here has been checked against a real console, except
+the section "USB hubs", which comes from a test on one.
 
 For the console itself, see [next-hack's repository](https://github.com/next-hack/uSVC).
 
@@ -27,6 +28,12 @@ For the console itself, see [next-hack's repository](https://github.com/next-hac
 | `0x6000` | The game. The loader sets the stack pointer from `[0x6000]` and jumps to `[0x6004]`; the game's reset handler then sets the vector table base to `0x6000`. |
 | `0x20000000` | One pointer, to the game's table of RAM pointers that the loader's library uses |
 | `0x20000004` | Game RAM |
+
+The loader's slot is 16384 bytes, and every game is linked to start right
+after it, so it cannot grow. The loader a console ships with (v0.1) uses all
+but 32 bytes. `make -C loader` builds it from the upstream source at 15940
+bytes, by leaving out the C library's start-up files and by three compiler
+options (see `loader/Makefile`). That build has not been run on a console.
 
 ## Frame and line timing
 
@@ -133,6 +140,30 @@ function pointers owned by the game loader: the table's address is stored at
 The library calls back into the game. For example, Redballs registers a
 function to run when a keyboard has been set up.
 
+## USB hubs
+
+The game loader has no hub driver, so nothing plugged into a hub is seen.
+The hardware can do it for full-speed devices: `loader/hubtest`, run on a
+console in the loader's place, set up a four-port hub (214B:7250), reset a
+port and read input reports from a full-speed gamepad behind it.
+
+- A low-speed device behind a hub (most wired keyboards) cannot work. It
+  needs a preamble packet that the SAMD21's host controller cannot send. The
+  hub reports such a device with the low-speed bit in its port status.
+- The kernel's USB stack asks for the configuration descriptor and the
+  product name with a length of 256 bytes. That hub answers such a request
+  with no data, so the stack sees an empty descriptor. Asking for 255 bytes
+  works.
+- A hub that has not been given a configuration acknowledges every request
+  and reports all its ports as off.
+
+`make -C loader HUB=1` builds a game loader that handles a hub itself, in
+its USB library, so games need no change (`loader/hub/usb_hub.c` explains
+how). It serves one device: the first full-speed device it finds on the
+hub. To make room it has no logo and no sound, and its menu shows version
+`0.1H`. Its menu has been run in the emulator; its hub code can only run on
+a console.
+
 ## The `.usc` package
 
 | Offset | Size | Contents |
@@ -146,7 +177,7 @@ function to run when a keyboard has been set up.
 | 320 | 2 x 32 | Author lines |
 | 384 | 32 | Date |
 | 416 | 32 | Version |
-| 512 | 7168 | Preview, 96x72 bytes in the 8bpp pixel format, padded to whole 512-byte sectors |
+| 512 | 7168 | Preview, 96x72 pixels in the 8bpp pixel format, stored as 108 tiles of 8x8 (64 bytes each, left to right then top to bottom), padded to whole 512-byte sectors |
 | 7680 | | The binary, as linked at `0x6000` |
 
 The game loader shows the text fields in a column 15 characters wide.

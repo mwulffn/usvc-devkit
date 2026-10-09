@@ -33,7 +33,9 @@ Innovation.
 Shardbreaker running in the emulator: 320x200 pixels, 256 colours, tiles and
 sprites drawn by the console's own kernel.
 
-Nothing here has been tested on a real console yet.
+Shardbreaker has been played on one real console, loaded by the game loader
+built here with USB hub support. The emulator has not been compared with a
+console in any detail.
 
 ## Getting started
 

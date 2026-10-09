@@ -222,5 +222,5 @@ Aids worth copying from Shardbreaker:
   goes on the SD card.
 - The emulator is more forgiving than a console: it has no flash wait states
   and does not model every bus effect. Leave a margin in frame time.
-- Nothing in this repository has yet run on real hardware. If you try it on
-  a console, please report what you see.
+- Only Shardbreaker has run on real hardware, on one console. If you try
+  something on a console, please report what you see.
