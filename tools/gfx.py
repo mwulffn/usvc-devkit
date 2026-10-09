@@ -21,7 +21,8 @@ centre). It writes OUT.c and OUT.h with `spriteData`, `frameData` and one
 In both files `#` starts a comment.
 
 `preview` scales any image to the 96x72 picture the game loader shows for a
-package and writes it as raw pixel bytes, for `usc.py pack --preview`.
+package and writes it the way the loader reads it, for `usc.py pack
+--preview`: as 8x8 tiles, left to right then top to bottom, 64 bytes each.
 """
 
 import argparse
@@ -178,7 +179,12 @@ PREVIEW_SIZE = (96, 72)
 def convert_preview(image_path: Path, out: Path) -> None:
     image = Image.open(image_path).convert("RGBA")
     image = image.resize(PREVIEW_SIZE, Image.Resampling.LANCZOS)
-    out.write_bytes(region_bytes(image, 0, 0, *PREVIEW_SIZE, sprite=False))
+    # The loader copies the picture into tiles, so it is stored tile by tile.
+    data = bytearray()
+    for y in range(0, PREVIEW_SIZE[1], TILE_SIZE):
+        for x in range(0, PREVIEW_SIZE[0], TILE_SIZE):
+            data += region_bytes(image, x, y, TILE_SIZE, TILE_SIZE, sprite=False)
+    out.write_bytes(data)
     print(f"preview {PREVIEW_SIZE[0]}x{PREVIEW_SIZE[1]} -> {out}")
 
 

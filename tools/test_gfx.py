@@ -46,3 +46,14 @@ def test_preview_is_scaled_to_loader_size(tmp_path: Path) -> None:
     Image.new("RGBA", (640, 400), (255, 0, 0, 255)).save(tmp_path / "shot.png")
     gfx.convert_preview(tmp_path / "shot.png", tmp_path / "p.raw")
     assert (tmp_path / "p.raw").read_bytes() == bytes([0x07]) * (96 * 72)
+
+
+def test_preview_is_stored_as_tiles(tmp_path: Path) -> None:
+    # Left half red, right half white: tiles 0-5 of each row of 12 are red.
+    image = Image.new("RGBA", (96, 72), (255, 0, 0, 255))
+    image.paste((255, 255, 255, 255), (48, 0, 96, 72))
+    image.save(tmp_path / "shot.png")
+    gfx.convert_preview(tmp_path / "shot.png", tmp_path / "p.raw")
+    data = (tmp_path / "p.raw").read_bytes()
+    assert data[: 6 * 64] == bytes([0x07]) * (6 * 64)
+    assert data[6 * 64 : 12 * 64] == bytes([0xFF]) * (6 * 64)

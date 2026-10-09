@@ -4,7 +4,8 @@
 
 A package is a 512-byte header, a 96x72 preview image padded to whole
 512-byte sectors, and the raw game binary that the loader writes to flash
-at 0x6000.
+at 0x6000. The preview is stored as 8x8 tiles of 64 bytes, left to right
+then top to bottom (`gfx.py preview` writes it).
 
 Usage:
     uv run usc.py info GAME.usc
@@ -191,7 +192,7 @@ def main() -> int:
     pack.add_argument("--author", action="append", default=[], help="up to 2")
     pack.add_argument("--date", default="")
     pack.add_argument("--version", default="")
-    pack.add_argument("--preview", type=Path, help="96x72 raw 8-bit image")
+    pack.add_argument("--preview", type=Path, help="96x72 picture from gfx.py preview")
     pack.set_defaults(func=cmd_pack)
 
     args = parser.parse_args()
